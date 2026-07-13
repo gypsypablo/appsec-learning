@@ -19,15 +19,12 @@ jobs:
           fetch-depth: 0
 
       # Шаг 2: Сканер секретов по официальному гайду
-      #- name: Secret Scanning
-      #  uses: trufflesecurity/trufflehog@27b0417c16317ca9a472a9a8092acce143b49c55
-      #  with:
-      #    extra_args: --results=verified,unverified,unknown --filter-entropy=3.0
+      - name: Secret Scanning
+        uses: trufflesecurity/trufflehog@27b0417c16317ca9a472a9a8092acce143b49c55
+        with:
+          extra_args: --results=verified,unverified,unknown --filter-entropy=3.0
 
-      # Шаг 2: Сканер секретов (Принудительное сканирование всей файловой системы через Docker)
-      - name: Secret Scanning (Docker OSS Mode)
-        run: |
-          docker run --rm -v "${{ github.workspace }}:/pwd" trufflesecurity/trufflehog filesystem /pwd --results=verified,unverified,unknown --fail
+      
 
       # Шаг 3: Статический анализ кода (Semgrep)
       - name: Semgrep SAST Scan (OSS Mode)
