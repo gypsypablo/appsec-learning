@@ -2,7 +2,7 @@ import sqlite3
 
 # 1. УЯЗВИМОСТЬ: Hardcoded Secret (Зашитый секрет)
 # TruffleHog должен это поймать!
-AWS_SECRET_KEY = "AKIAIMXFFAOXEXAMPLE_SECRET_KEY_12345"
+GITHUB_TOKEN = "ghp_1234567890abcdefghijklmnopqrstuvwxyzABCD"
 
 def get_user_data(username):
     conn = sqlite3.connect('users.db')
