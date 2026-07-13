@@ -27,4 +27,4 @@ jobs:
       # Шаг 3: Статический анализ кода (Semgrep)
       - name: Semgrep SAST Scan (OSS Mode)
         run: |
-          docker run --rm -v "${{ github.workspace }}:/src" semgrep/semgrep semgrep scan --config=p/default
+          docker run --rm -v "${{ github.workspace }}:/src" semgrep/semgrep semgrep scan --config=p/default --error
