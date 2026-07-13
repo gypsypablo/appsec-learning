@@ -1,27 +1,28 @@
-# test test
-
-import os
 import sqlite3
 import requests
 
-# 1. ИСПРАВЛЕНИЕ СЕКРЕТА: Убираем токен из кода
-# Вместо зашитой строки мы берем токен из переменных окружения (Environment Variables)
-# На сервере (или в GitHub Actions) мы положим его в секреты, и код подтянет его на лету
-SLACK_WEBHOOK_URL = os.environ.get("SLACK_WEBHOOK_URL")
+# Наш тестовый Slack Webhook для проверки TruffleHog
+SLACK_LOGS_WEBHOOK = "https://hooks.slack.com/services/T01234567/B01234567/Tk9UX0FfUkVBTF9UT0tFTl9KVVNUX1RFU1RJTkc="
+
+def send_slack_alert(message):
+    """Функция отправки системных алертов в Slack логгер"""
+    payload = {"text": f"🚨 System Alert: {message}"}
+    try:
+        response = requests.post(SLACK_LOGS_WEBHOOK, json=payload, timeout=5)
+        return response.status_code == 200
+    except requests.exceptions.RequestException:
+        return False
 
 def get_user_data(username):
+    # Безопасный параметризованный запрос (Semgrep будет доволен)
     conn = sqlite3.connect('users.db')
     cursor = conn.cursor()
-    
-    # 2. ИСПРАВЛЕНИЕ SQLi: Используем параметризованный запрос (Parameterized Query)
-    # Вместо f-строки мы ставим знак вопроса '?'. 
-    # Теперь библиотека sqlite3 сама очистит и безопасно вставит переменную username,
-    # полностью исключая возможность внедрения вредоносного SQL-кода.
     query = "SELECT * FROM users WHERE username = ?"
-    
     cursor.execute(query, (username,))
-    return cursor.fetchall()
-
-def send_notification(message):
-    if SLACK_WEBHOOK_URL:
-        requests.post(SLACK_WEBHOOK_URL, json={"text": message})
+    
+    user = cursor.fetchall()
+    
+    # Триггерим отправку алерта при запросе данных
+    send_slack_alert(f"User data requested for username: {username}")
+    
+    return user
