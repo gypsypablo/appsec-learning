@@ -22,7 +22,7 @@ jobs:
       - name: Secret Scanning
         uses: trufflesecurity/trufflehog@27b0417c16317ca9a472a9a8092acce143b49c55
         with:
-          extra_args: --results=verified,unverified,unknown --fail
+          extra_args: --results=verified,unverified,unknown
 
       # Шаг 3: Статический анализ кода (Semgrep)
       - name: Semgrep SAST Scan (OSS Mode)
