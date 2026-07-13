@@ -22,7 +22,7 @@ jobs:
       - name: Secret Scanning
         uses: trufflesecurity/trufflehog@27b0417c16317ca9a472a9a8092acce143b49c55
         with:
-          extra_args: --results=verified,unverified,unknown --filter-entropy=3.0 --no-github-actions --log-level=0
+          extra_args: --results=verified,unverified,unknown --filter-entropy=3.0 --log-level=0
 
       
 
