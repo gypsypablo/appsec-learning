@@ -1,31 +1,27 @@
-# Testing here again and again and again and again and again and again
+# test
 
+import os
 import sqlite3
+import requests
 
-# Тестовый приватный ключ для проверки сканера секретов
-DUMMY_PRIVATE_KEY = """
------BEGIN OPENSSH PRIVATE KEY-----
-b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAMwAAAAtzc2gtcn
-NhAAAAAwEAAQAAAYEAm16R+V7vJ2yG8mK6ZlP0C9f+Y3XFpZ1234567890abcdefghij
------END OPENSSH PRIVATE KEY-----
-"""
-
-# Настоящий паттерн Slack Webhook. TruffleHog триггерится на него моментально! (testing)
-SLACK_WEBHOOK = "https://hooks.slack.com/services/T01234567/B01234567/Tk9UX0FfUkVBTF9UT0tFTl9KVVNUX1RFU1RJTkc="
-
-
-
-db_password = "MySuperSecretPassword123"
-
-
+# 1. ИСПРАВЛЕНИЕ СЕКРЕТА: Убираем токен из кода
+# Вместо зашитой строки мы берем токен из переменных окружения (Environment Variables)
+# На сервере (или в GitHub Actions) мы положим его в секреты, и код подтянет его на лету
+SLACK_WEBHOOK_URL = os.environ.get("SLACK_WEBHOOK_URL")
 
 def get_user_data(username):
     conn = sqlite3.connect('users.db')
     cursor = conn.cursor()
     
-    # 2. УЯЗВИМОСТЬ: SQL Injection (SQL-инъекция)
-    # Переменная username вставляется напрямую в запрос. Semgrep должен это поймать!
-    query = f"SELECT * FROM users WHERE username = '{username}'"
+    # 2. ИСПРАВЛЕНИЕ SQLi: Используем параметризованный запрос (Parameterized Query)
+    # Вместо f-строки мы ставим знак вопроса '?'. 
+    # Теперь библиотека sqlite3 сама очистит и безопасно вставит переменную username,
+    # полностью исключая возможность внедрения вредоносного SQL-кода.
+    query = "SELECT * FROM users WHERE username = ?"
     
-    cursor.execute(query)
+    cursor.execute(query, (username,))
     return cursor.fetchall()
+
+def send_notification(message):
+    if SLACK_WEBHOOK_URL:
+        requests.post(SLACK_WEBHOOK_URL, json={"text": message})
