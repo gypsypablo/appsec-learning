@@ -25,7 +25,6 @@ jobs:
           extra_args: --results=verified,unknown
 
       # Шаг 3: Статический анализ кода (Semgrep)
-      - name: Semgrep SAST Scan
-        uses: semgrep/semgrep-action@v1
-        with:
-          config: p/default
+      - name: Semgrep SAST Scan (OSS Mode)
+        run: |
+          docker run --rm -v "${{ github.workspace }}:/src" semgrep/semgrep semgrep scan --config=p/default
