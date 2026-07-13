@@ -1,3 +1,5 @@
+# I deleted secrets
+
 import os
 import sqlite3
 import requests
