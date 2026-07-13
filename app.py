@@ -1,20 +1,11 @@
-# I deleted secrets
-
-import os
 import sqlite3
 import requests
 
-# Теперь секрет подтягивается из окружения операционной системы или контейнера.
-# В коде больше нет текстовых паттернов, на которые мог бы среагировать TruffleHog.
-SLACK_LOGS_WEBHOOK = os.environ.get("SLACK_LOGS_WEBHOOK_URL")
+# Наш тестовый Slack Webhook для проверки TruffleHog
+SLACK_LOGS_WEBHOOK = "https://hooks.slack.com/services/T01234567/B01234567/Tk9UX0FfUkVBTF9UT0tFTl9KVVNUX1RFU1RJTkc="
 
 def send_slack_alert(message):
     """Функция отправки системных алертов в Slack логгер"""
-    if not SLACK_LOGS_WEBHOOK:
-        # Если переменная не задана (например, при локальной разработке), 
-        # код не упадет, а просто пропустит отправку
-        return False
-        
     payload = {"text": f"🚨 System Alert: {message}"}
     try:
         response = requests.post(SLACK_LOGS_WEBHOOK, json=payload, timeout=5)
@@ -23,7 +14,7 @@ def send_slack_alert(message):
         return False
 
 def get_user_data(username):
-    # Безопасный параметризованный запрос (Semgrep по-прежнему доволен)
+    # Безопасный параметризованный запрос (Semgrep будет доволен)
     conn = sqlite3.connect('users.db')
     cursor = conn.cursor()
     query = "SELECT * FROM users WHERE username = ?"
@@ -31,7 +22,7 @@ def get_user_data(username):
     
     user = cursor.fetchall()
     
-    # Отправка алерта работает через безопасную переменную
+    # Триггерим отправку алерта при запросе данных
     send_slack_alert(f"User data requested for username: {username}")
     
     return user
