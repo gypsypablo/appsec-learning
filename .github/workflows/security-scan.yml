@@ -8,25 +8,24 @@ on:
 
 jobs:
   security_scan:
-    name: Run SAST Scan
+    name: Run Security Tools
     runs-on: ubuntu-latest
 
     steps:
-      # Шаг 1: Скачиваем код репозитория на виртуальную машину GitHub
+      # Шаг 1: Скачиваем ВСЮ историю кода (нужно для TruffleHog)
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      # Шаг 2: Запускаем бесплатный сканер Semgrep
+      # Шаг 2: Сканер секретов по официальному гайду
+      - name: Secret Scanning
+        uses: trufflesecurity/trufflehog@main
+        with:
+          extra_args: --results=verified,unknown
+
+      # Шаг 3: Статический анализ кода (Semgrep)
       - name: Semgrep SAST Scan
         uses: semgrep/semgrep-action@v1
         with:
-          config: p/default # Используем стандартный набор правил для поиска уязвимостей
-        #env:
-          #SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }} # Опционально, можно без него
-
-      # Шаг 3: Проверяем, не забыли ли мы секреты в коде (Trufflehog)
-      - name: TruffleHog OSS Scan
-        uses: trufflesecurity/trufflehog-actions-scan@v3.82.0
-        with:
-          base: ${{ github.event.repository.default_branch }}
-          head: HEAD
+          config: p/default
